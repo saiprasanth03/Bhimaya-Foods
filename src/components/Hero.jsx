@@ -12,12 +12,12 @@ function Hero() {
     >
       <div className="text-center max-w-3xl px-6">
         <h1 className="text-5xl md:text-6xl font-playfair mb-6 leading-tight">
-          Experience the Heritage of{" "}
-          <span className="text-secondary">Pure Taste</span>
+          Welcome To{" "}<br/>
+          <span className="text-secondary">BHIMAYA FOODS</span>
         </h1>
 
         <p className="mb-8 text-lg">
-          Crunchy, savory, and sweet – crafted with tradition and excellence.
+          Experience the Best Homemade Foods
         </p>
 
         <div className="space-x-4">
