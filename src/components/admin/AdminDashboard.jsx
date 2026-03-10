@@ -302,6 +302,33 @@ const AdminDashboard = () => {
         }
     };
 
+    const handlePurgeCustomers = async () => {
+        if (!isDeveloper) return;
+
+        const confirmation1 = window.confirm("🚨 CRITICAL WARNING 🚨\n\nYou are about to DELETE ALL CUSTOMER DATA from the database.\n\nThis action CANNOT BE UNDONE. Are you absolutely sure?");
+
+        if (confirmation1) {
+            const confirmation2 = window.prompt("To proceed, please type exactly:\n\nPURGE MY CUSTOMERS\n\nin the box below:");
+
+            if (confirmation2 === "PURGE MY CUSTOMERS") {
+                try {
+                    // Fetch all existing customers and delete them one by one
+                    for (const customer of customersList) {
+                        await deleteDoc(doc(db, "customers", customer.id));
+                    }
+
+                    alert("✅ CUSTOMER DATABASE PURGED SUCCESSFULLY!");
+                    fetchCustomers(); // Refresh the local state immediately
+                } catch (error) {
+                    console.error("Error purging customers:", error);
+                    alert("❌ Failed to purge customer database. Check console logs.");
+                }
+            } else {
+                alert("Operation cancelled. Incorrect confirmation phrase.");
+            }
+        }
+    };
+
     const handleSaveSettings = async (e) => {
         e.preventDefault();
         try {
