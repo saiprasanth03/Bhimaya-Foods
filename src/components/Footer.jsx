@@ -28,6 +28,7 @@ function Footer() {
       <div className="text-center mt-10 text-sm opacity-70 space-y-2">
         <p>FSSAI no : 20126121000164</p>
         <p>© 2026 Bhimaya Foods. All rights reserved.</p>
+        <p>Developed by <a href="https://wa.me/918341699318" target="_blank" rel="noopener noreferrer" className="hover:text-secondary underline transition decoration-dotted underline-offset-4">Sai Prasanth</a></p>
       </div>
     </footer>
   );
