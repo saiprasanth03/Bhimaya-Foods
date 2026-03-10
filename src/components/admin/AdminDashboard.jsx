@@ -433,8 +433,12 @@ const AdminDashboard = () => {
             resetForm();
             fetchProducts();
         } catch (error) {
-            console.error("Error saving product:", error);
-            alert("Failed to save product.");
+            console.error("Error saving product exact details:", error);
+            if (error.code === 'resource-exhausted') {
+                alert("❌ Failed: The image file is way too large (Over 1MB). Please select a smaller image or compress it first.");
+            } else {
+                alert(`❌ Failed to save product.\n\nError Message: ${error.message}\nError Code: ${error.code}\nFull Error: ${JSON.stringify(error)}`);
+            }
         }
     };
 
