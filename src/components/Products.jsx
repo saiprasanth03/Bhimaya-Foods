@@ -41,7 +41,8 @@ function Products({
     <section id="products" className="py-10 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         <h2 className="text-4xl font-playfair text-primary text-center mb-10">
-          Wholesome Delicacies
+          {/* Wholesome Delicacies */}
+          Homestyle Delights
         </h2>
 
         {/* --- Search and Filter Bar --- */}
