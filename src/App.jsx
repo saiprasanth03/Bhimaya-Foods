@@ -45,6 +45,7 @@ function App() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   const WHATSAPP_NUMBER = "919493023030";
 
@@ -68,7 +69,7 @@ function App() {
       setCart([...cart, { ...product, quantity: 1 }]);
     }
 
-    setIsCartOpen(true);
+    // setIsCartOpen(true); // User requested to disable auto-open
   };
 
   const increaseQuantity = (id) => {
@@ -258,6 +259,8 @@ function App() {
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
+      } finally {
+        setSettingsLoading(false);
       }
     };
     fetchSettings();
@@ -294,7 +297,7 @@ function App() {
   if (!isOnline) {
     return <Offline />;
   }
-  if (loading || userLoading) {
+  if (loading || userLoading || settingsLoading) {
     return <Loader />;
   }
 

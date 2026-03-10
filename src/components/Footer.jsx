@@ -16,13 +16,18 @@ function Footer() {
 
         <div>
           <h4 className="font-semibold mb-4">Reach Us</h4>
-          <p>Email: bhimayafoods@gmail.com</p>
-          <p>WhatsApp: +91 9493023030</p>
+          <p>
+            Email: <a href="mailto:bhimayafoods@gmail.com" className="hover:text-secondary transition">bhimayafoods@gmail.com</a>
+          </p>
+          <p>
+            WhatsApp: <a href="https://wa.me/919493023030" className="hover:text-secondary transition">+91 9493023030</a>
+          </p>
         </div>
       </div>
 
-      <div className="text-center mt-10 text-sm opacity-70">
-        © 2026 Bhimaya Foods. All rights reserved.
+      <div className="text-center mt-10 text-sm opacity-70 space-y-2">
+        <p>FSSAI no : 20126121000164</p>
+        <p>© 2026 Bhimaya Foods. All rights reserved.</p>
       </div>
     </footer>
   );
