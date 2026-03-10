@@ -4,7 +4,8 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10">
         <div>
           <h3 className="text-2xl font-bold mb-4">BHIMAYA FOODS</h3>
-          <p>Spreading joy through flavors.</p>
+          <p>Spreading joy through flavors.</p><br/>
+          <p>FSSAI No : 20126121000164</p>
         </div>
 
         <div>
@@ -26,7 +27,6 @@ function Footer() {
       </div>
 
       <div className="text-center mt-10 text-sm opacity-70 space-y-2">
-        <p>FSSAI No : 20126121000164</p>
         <p>© 2026 Bhimaya Foods. All rights reserved.</p>
       </div>
     </footer>
