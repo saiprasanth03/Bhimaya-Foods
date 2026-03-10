@@ -1086,6 +1086,12 @@ const AdminDashboard = () => {
                                         >
                                             Purge All Orders
                                         </button>
+                                        <button
+                                            onClick={handlePurgeCustomers}
+                                            className="bg-red-600 text-white px-4 py-2 rounded font-bold hover:bg-black transition"
+                                        >
+                                            Purge All Customers
+                                        </button>
                                     </div>
                                 </div>
 
