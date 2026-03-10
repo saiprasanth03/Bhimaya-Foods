@@ -456,21 +456,33 @@ const AdminDashboard = () => {
                     {activeTab === 'analytics' && (
                         <div className="space-y-6 animate-fadeIn">
                             <h2 className="text-xl font-semibold mb-4 text-gray-800">Store Overview & Analytics</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
                                 <div className="bg-white p-6 rounded shadow-sm border-t-4 border-green-500">
-                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Revenue (Completed)</p>
+                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Revenue (Delivered)</p>
                                     <p className="text-3xl font-bold text-gray-800 mt-2">
-                                        ₹{ordersList.filter(o => o.status === 'Completed').reduce((sum, order) => sum + (parseFloat(order.totalAmount) || 0), 0).toFixed(2)}
+                                        ₹{ordersList.filter(o => o.status === 'Delivered').reduce((sum, order) => sum + (parseFloat(order.totalAmount) || 0), 0).toFixed(2)}
                                     </p>
                                 </div>
                                 <div className="bg-white p-6 rounded shadow-sm border-t-4 border-blue-500">
-                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Lifetime Orders</p>
+                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Orders</p>
                                     <p className="text-3xl font-bold text-gray-800 mt-2">{ordersList.length}</p>
                                 </div>
                                 <div className="bg-white p-6 rounded shadow-sm border-t-4 border-orange-500">
-                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Pending / Processing Orders</p>
+                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Pending / Process</p>
                                     <p className="text-3xl font-bold text-gray-800 mt-2">
-                                        {ordersList.filter(o => o.status !== 'Completed').length}
+                                        {ordersList.filter(o => o.status !== 'Delivered' && o.status !== 'Rejected').length}
+                                    </p>
+                                </div>
+                                <div className="bg-white p-6 rounded shadow-sm border-t-4 border-teal-500">
+                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Delivered Orders</p>
+                                    <p className="text-3xl font-bold text-gray-800 mt-2">
+                                        {ordersList.filter(o => o.status === 'Delivered').length}
+                                    </p>
+                                </div>
+                                <div className="bg-white p-6 rounded shadow-sm border-t-4 border-red-500">
+                                    <p className="text-gray-500 text-sm font-medium uppercase tracking-wide">Rejected Orders</p>
+                                    <p className="text-3xl font-bold text-gray-800 mt-2">
+                                        {ordersList.filter(o => o.status === 'Rejected').length}
                                     </p>
                                 </div>
                             </div>
