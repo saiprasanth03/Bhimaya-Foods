@@ -10,7 +10,7 @@ function Cart({
 }) {
 
   const DELIVERY_CHARGE = 50;
-  const FREE_LIMIT = 499;
+  const FREE_LIMIT = 599;
 
   const isItemOutOfStock = (item) => {
     const liveProduct = products?.find(p => p.id === item.id);

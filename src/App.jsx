@@ -102,7 +102,7 @@ function App() {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const DELIVERY_CHARGE = 50;
-  const FREE_LIMIT = 499;
+  const FREE_LIMIT = 599;
 
   const delivery = total >= FREE_LIMIT ? 0 : DELIVERY_CHARGE;
   const finalTotal = total + delivery;
