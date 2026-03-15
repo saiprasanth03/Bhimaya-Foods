@@ -221,6 +221,7 @@ function App() {
           name: item.name,
           price: item.price,
           quantity: item.quantity,
+          weight: item.weight || '',
           image: item.image || ''
         })),
         subtotal: total,

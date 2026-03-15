@@ -14,6 +14,7 @@ const AdminDashboard = () => {
     const [imageName, setImageName] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
+    const [availableWeights, setAvailableWeights] = useState(['500gm']); // Default weight
     const [editingId, setEditingId] = useState(null);
 
     // Store Settings State
@@ -240,7 +241,7 @@ const AdminDashboard = () => {
             order.id,
             order.totalAmount,
             order.status,
-            order.items?.map(i => `${i.name} (x${i.quantity})`).join(" | ") || "",
+            order.items?.map(i => `${i.name}${i.weight ? ' (' + i.weight + ')' : ''} (x${i.quantity})`).join(" | ") || "",
             order.customerAddress || ""
         ]);
         const csvContent = headers.join(",") + "\n"
@@ -395,6 +396,7 @@ const AdminDashboard = () => {
         setImageName('');
         setDescription('');
         setCategory('');
+        setAvailableWeights(['500gm']);
         setEditingId(null);
     };
 
@@ -405,6 +407,7 @@ const AdminDashboard = () => {
         setImageName(product.image ? 'Existing Image' : '');
         setDescription(product.description || '');
         setCategory(product.category || '');
+        setAvailableWeights(product.availableWeights || ['1000gm']);
         setEditingId(product.id);
     };
 
@@ -423,6 +426,7 @@ const AdminDashboard = () => {
             image,
             description,
             category,
+            availableWeights,
             quantity: "1kg" // Standardized to 1kg
         };
 
@@ -681,6 +685,30 @@ const AdminDashboard = () => {
                                         </select>
                                     </div>
 
+                                    <div>
+                                        <label className="block text-gray-700 text-sm font-bold mb-2">Available Weights</label>
+                                        <div className="flex gap-4 p-2 border rounded bg-gray-50">
+                                            {['250gm', '500gm', '1000gm'].map(w => (
+                                                <label key={w} className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={availableWeights.includes(w)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setAvailableWeights([...availableWeights, w]);
+                                                            } else {
+                                                                setAvailableWeights(availableWeights.filter(item => item !== w));
+                                                            }
+                                                        }}
+                                                        className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                                                    />
+                                                    <span className="text-sm font-medium text-gray-700">{w}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 mt-1 italic">Select the weight options you want to offer for this product. 500gm is recommended as default.</p>
+                                    </div>
+
 
                                     <div>
                                         <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>
@@ -724,6 +752,7 @@ const AdminDashboard = () => {
                                                     <th className="p-3">Name</th>
                                                     <th className="p-3">Price (1kg)</th>
                                                     <th className="p-3">Category</th>
+                                                    <th className="p-3">Weights</th>
                                                     <th className="p-3 text-right">Actions</th>
                                                 </tr>
                                             </thead>
@@ -743,6 +772,15 @@ const AdminDashboard = () => {
                                                                 <td className="p-3 font-medium">{product.name}</td>
                                                                 <td className="p-3">₹{product.price}</td>
                                                                 <td className="p-3 text-sm text-gray-600">{product.category}</td>
+                                                                <td className="p-3">
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {(product.availableWeights || ['1000gm']).map(w => (
+                                                                            <span key={w} className="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold">
+                                                                                {w}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                </td>
                                                                 <td className="p-3 text-right space-x-2 whitespace-nowrap">
                                                                     <button onClick={() => handleEdit(product)} className="text-blue-500 hover:text-blue-700">Edit</button>
                                                                     <button onClick={() => handleDelete(product.id)} className="text-red-500 hover:text-red-700">Delete</button>
@@ -845,7 +883,7 @@ const AdminDashboard = () => {
                                                             )}
                                                             <ul className="mt-2 text-xs text-gray-600 border-t pt-2">
                                                                 {order.items?.map((item, idx) => (
-                                                                    <li key={idx} className="list-disc list-inside">{item.name} (x{item.quantity})</li>
+                                                                    <li key={idx} className="list-disc list-inside">{item.name}{item.weight ? ` (${item.weight})` : ""} (x{item.quantity})</li>
                                                                 ))}
                                                             </ul>
                                                         </td>

@@ -99,6 +99,45 @@ function Products({
             />
           ))}
         </div>
+
+        {/* --- Features Section --- */}
+        <div className="mt-24 text-center mb-12">
+          <h2 className="text-4xl font-playfair text-primary mb-4">Why Bhimaya Foods?</h2>
+          <p className="text-gray-500 max-w-2xl mx-auto">Discover why our traditional, homemade delicacies are the preferred choice for families.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow border border-orange-50 text-center flex flex-col items-center">
+            <div className="w-32 h-32 bg-orange-50 rounded-3xl flex items-center justify-center mb-6">
+               <span className="text-5xl">🌿</span>
+            </div>
+            <h3 className="text-2xl font-playfair text-primary mb-4 font-bold">Chemical Free</h3>
+            <p className="text-gray-600 leading-relaxed text-sm">
+              Enjoy the purity of traditional homemade foods made without harmful chemicals or preservatives. At Bhimaya Foods, we focus on natural ingredients and authentic preparation methods to bring you safe, healthy, and flavorful products.
+            </p>
+          </div>
+
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow border border-orange-50 text-center flex flex-col items-center">
+            <div className="w-32 h-32 bg-orange-50 rounded-3xl flex items-center justify-center mb-6">
+               <span className="text-5xl">🍲</span>
+            </div>
+            <h3 className="text-2xl font-playfair text-primary mb-4 font-bold">Authentic Taste</h3>
+            <p className="text-gray-600 leading-relaxed text-sm">
+              Experience the true taste of tradition. Our foods are prepared using carefully selected ingredients and time-honored recipes, ensuring every bite delivers the rich and authentic flavors of homemade goodness.
+            </p>
+          </div>
+
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow border border-orange-50 text-center flex flex-col items-center">
+            <div className="w-32 h-32 bg-orange-50 rounded-3xl flex items-center justify-center mb-6">
+               <span className="text-5xl">🚚</span>
+            </div>
+            <h3 className="text-2xl font-playfair text-primary mb-4 font-bold">Fast Delivery</h3>
+            <p className="text-gray-600 leading-relaxed text-sm">
+              Get your favorite traditional foods delivered fresh and quickly to your doorstep. With our reliable delivery service, Bhimaya Foods ensures your orders arrive safely and on time.
+            </p>
+          </div>
+        </div>
+        {/* --- End Features Section --- */}
       </div>
     </section>
   );
@@ -111,16 +150,22 @@ function ProductCard({
   increaseQuantity,
   decreaseQuantity,
 }) {
-  const [selectedWeight, setSelectedWeight] = useState("250gm");
+  const availableWeightsList = product.availableWeights || ['1000gm'];
+  const [selectedWeight, setSelectedWeight] = useState(() => {
+    if (availableWeightsList.includes("500gm")) return "500gm";
+    return availableWeightsList[0];
+  });
 
-  const weights = [
+  const allWeights = [
     { label: "250gm", factor: 0.25 },
     { label: "500gm", factor: 0.5 },
     { label: "1000gm", factor: 1 },
   ];
 
+  const weights = allWeights.filter(w => availableWeightsList.includes(w.label));
+
   const basePrice = parseFloat(product.price) || 0;
-  const currentPrice = Math.round(basePrice * (weights.find(w => w.label === selectedWeight)?.factor || 1));
+  const currentPrice = Math.round(basePrice * (allWeights.find(w => w.label === selectedWeight)?.factor || 1));
   const cartItemId = `${product.id}_${selectedWeight}`;
   
   const qty = cart.find((item) => item.cartItemId === cartItemId)?.quantity || 0;
@@ -147,7 +192,7 @@ function ProductCard({
           {product.name}
         </h3>
 
-        <div className="min-h-[2.5rem] mt-1 mb-4">
+        <div className="mt-1 mb-2 min-h-[1.25rem]">
           {product.description && (
             <p className={`text-sm ${product.description.toLowerCase().includes('out of stock') ? 'text-red-500 font-bold' : 'text-gray-600'}`}>
               {product.description}
@@ -161,9 +206,9 @@ function ProductCard({
             <button
               key={w.label}
               onClick={() => setSelectedWeight(w.label)}
-              className={`flex-1 py-1 px-2 rounded-md text-xs font-medium transition-all ${selectedWeight === w.label
-                ? "bg-primary text-white shadow-sm"
-                : "bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-primary"
+              className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${selectedWeight === w.label
+                ? "bg-primary text-white border-primary shadow-sm"
+                : "bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary"
                 }`}
             >
               {w.label}

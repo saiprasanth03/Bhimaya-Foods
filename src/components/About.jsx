@@ -1,4 +1,4 @@
-import aboutImg from "../assets/savory_snack_1.png";
+import aboutImg from "../assets/bottomimg.jpeg";
 
 function About() {
   return (
