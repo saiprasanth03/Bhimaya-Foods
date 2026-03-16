@@ -41,6 +41,7 @@ const AdminDashboard = () => {
     // Analytics & Search State
     const [productSearch, setProductSearch] = useState('');
     const [orderSearch, setOrderSearch] = useState('');
+    const [lastOrderSync, setLastOrderSync] = useState('');
 
     // Dashboard UI State
     const [activeTab, setActiveTab] = useState('analytics');
@@ -164,20 +165,33 @@ const AdminDashboard = () => {
 
         const q = query(collection(db, "orders"));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const orders = querySnapshot.docs.map(d => ({
-                id: d.id,
-                ...d.data()
-            }));
-            orders.sort((a, b) => {
-                if (!a.createdAt) return 1;
-                if (!b.createdAt) return -1;
-                return b.createdAt.toMillis() - a.createdAt.toMillis();
-            });
-            setOrdersList(orders);
-            setOrdersLoading(false);
+            try {
+                const orders = querySnapshot.docs.map(d => ({
+                    id: d.id,
+                    ...d.data()
+                }));
+                orders.sort((a, b) => {
+                    // Return -1 to put 'Just now' (pending) orders at the very top
+                    if (!a.createdAt) return -1;
+                    if (!b.createdAt) return 1;
+                    
+                    // Handle cases where createdAt might not be a Firestore Timestamp unexpectedly
+                    const timeA = typeof a.createdAt.toMillis === 'function' ? a.createdAt.toMillis() : (a.createdAt.seconds * 1000 || 0);
+                    const timeB = typeof b.createdAt.toMillis === 'function' ? b.createdAt.toMillis() : (b.createdAt.seconds * 1000 || 0);
+                    
+                    return timeB - timeA;
+                });
+                setOrdersList(orders);
+                setOrdersLoading(false);
+                setLastOrderSync(new Date().toLocaleTimeString());
+            } catch (err) {
+                console.error("Critical error processing orders snapshot:", err);
+                setLastOrderSync("Process Error");
+            }
         }, (error) => {
             console.error("Error fetching orders:", error);
             setOrdersLoading(false);
+            setLastOrderSync("Error");
         });
         ordersUnsubRef.current = unsubscribe;
         return unsubscribe;
@@ -278,7 +292,8 @@ const AdminDashboard = () => {
             }
         } catch (error) {
             console.error("Login error:", error);
-            alert("❌ Connection error. Please ensure you have an active internet connection.");
+            let technicalDetail = error.message || "Network Error";
+            alert(`❌ Connection error: ${technicalDetail}\n\nTroubleshooting:\n1. Ensure you have an active internet connection.\n2. If on Localhost, ensure Vite Proxy is configured correctly.\n3. Shiprocket API might be temporarily down.`);
         } finally {
             setTokenLoading(false);
         }
@@ -1107,7 +1122,6 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* Orders Management Section */}
                     {activeTab === 'orders' && (
                         <div className="bg-white p-6 rounded shadow-md animate-fadeIn">
                             <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
@@ -1199,7 +1213,7 @@ const AdminDashboard = () => {
                                                         {showSrPassword ? (
                                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
                                                         ) : (
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542-7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                         )}
                                                     </button>
                                                 </div>
@@ -1230,7 +1244,7 @@ const AdminDashboard = () => {
                                                             {showSrPassword ? (
                                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
                                                             ) : (
-                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542-7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                             )}
                                                         </button>
                                                     </div>
@@ -1348,9 +1362,32 @@ const AdminDashboard = () => {
 
                                 <div className="mt-3 text-[10px] text-purple-400 flex items-center gap-2">
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    Don't have an API User? Go to <a href="https://app.shiprocket.in/api-user" target="_blank" rel="noopener noreferrer" className="underline font-bold">Settings &gt; API &gt; Configure</a> on Shiprocket Dashboard. 
-                                    <span className="ml-1 text-purple-600 italic">(Note: API Email must be DIFFERENT from your main login email)</span>
+                                    Shiprocket One-Click Sync: Ensure your token is fresh and pickup location is selected.
                                 </div>
+                            </div>
+
+                            <div className="flex items-center justify-between mb-4 bg-white/50 p-4 rounded-2xl border border-gray-100">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-green-500 w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                                    <h3 className="text-xl font-bold text-gray-800">Live Orders</h3>
+                                    <span className="text-[10px] bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full font-bold">
+                                        {ordersList.length} Total
+                                    </span>
+                                    {lastOrderSync && (
+                                        <span className="text-[10px] text-green-600 font-medium">
+                                            Last update: {lastOrderSync}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="text-[10px] text-gray-400 italic">
+                                    Updates in real-time as customers order
+                                </div>
+                            </div>
+
+                            <div className="mt-2 text-[10px] text-purple-400 flex items-center gap-2 mb-4">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Don't have an API User? Go to <a href="https://app.shiprocket.in/api-user" target="_blank" rel="noopener noreferrer" className="underline font-bold">Settings &gt; API &gt; Configure</a> on Shiprocket Dashboard. 
+                                <span className="ml-1 text-purple-600 italic">(Note: API Email must be DIFFERENT from your main login email)</span>
                             </div>
 
                             <style dangerouslySetInnerHTML={{ __html: `

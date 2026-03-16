@@ -51,6 +51,7 @@ function App() {
   const [validStateForPincode, setValidStateForPincode] = useState("");
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(true);
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("whatsapp"); // 'whatsapp' initialized
 
   const WHATSAPP_NUMBER = "919493023030";
@@ -222,23 +223,9 @@ function App() {
 
     const encodedMessage = encodeURIComponent(messageText);
 
-    // ✅ Open WhatsApp IMMEDIATELY (before any await) to bypass browser popup blockers
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`,
-      "_blank"
-    );
-
-    // Clear cart and close modals
-    setCart([]);
-    setShowCheckoutForm(false);
-    setCustomerName("");
-    setCustomerPhone("");
-    setCustomerAddress("");
-    setCustomerCity("");
-    setCustomerState("");
-    setCustomerPincode("");
-
-    // Save customer and order to Firestore in the background
+    setIsProcessingOrder(true);
+    
+    // Save customer and order to Firestore
     try {
       const customerDocRef = doc(db, "customers", phoneSnapshot);
       const customerDoc = await getDoc(customerDocRef);
@@ -291,10 +278,31 @@ function App() {
         paymentStatus: 'Pending',
         createdAt: serverTimestamp()
       };
+      
       await addDoc(collection(db, "orders"), orderData);
+
+      // ✅ SUCCESS: ONLY NOW open WhatsApp and clear UI
+      window.open(
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`,
+        "_blank"
+      );
+
+      setCart([]);
+      setShowCheckoutForm(false);
+      setCustomerName("");
+      setCustomerPhone("");
+      setCustomerAddress("");
+      setCustomerCity("");
+      setCustomerState("");
+      setCustomerPincode("");
+      
+      alert(`🎉 Order #${orderID} placed successfully! We've opened WhatsApp for you to confirm the order.`);
 
     } catch (error) {
       console.error("Error saving order:", error);
+      alert(`❌ Ops! We couldn't save your order to the database.\n\nError: ${error.message || "Connection issue"}\n\nPlease try again or contact us directly.`);
+    } finally {
+      setIsProcessingOrder(false);
     }
   };
 
@@ -576,10 +584,20 @@ function App() {
 
               <button
                 type="submit"
-                className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition flex justify-center items-center gap-2 mt-4"
+                disabled={isProcessingOrder}
+                className={`w-full ${isProcessingOrder ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'} text-white font-bold py-3 px-4 rounded-lg transition flex justify-center items-center gap-2 mt-4 shadow-lg active:scale-95`}
               >
-                <span>Continue to WhatsApp</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.66-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" /></svg>
+                {isProcessingOrder ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span>Saving Order...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Continue to WhatsApp</span>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.66-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" /></svg>
+                  </>
+                )}
               </button>
             </form>
           </div>
