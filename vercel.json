@@ -1,6 +1,7 @@
 {
   "routes": [
     { "handle": "filesystem" },
+    { "src": "/api/shiprocket/(.*)", "dest": "https://apiv2.shiprocket.in/v1/external/$1" },
     { "src": "/.*", "dest": "/index.html" }
   ]
 }

@@ -203,7 +203,7 @@ const AdminDashboard = () => {
 
         setTokenLoading(true);
         try {
-            const response = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
+            const response = await fetch('/api/shiprocket/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, password: password })
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
                 
                 // Also fetch pickup locations automatically
                 try {
-                    const locationsRes = await fetch('https://apiv2.shiprocket.in/v1/external/settings/get/pickup', {
+                    const locationsRes = await fetch('/api/shiprocket/settings/get/pickup', {
                         method: 'GET',
                         headers: { 
                             'Content-Type': 'application/json',
@@ -317,7 +317,7 @@ const AdminDashboard = () => {
                 weight: 0.5
             };
 
-            const response = await fetch('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', {
+            const response = await fetch('/api/shiprocket/orders/create/adhoc', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
