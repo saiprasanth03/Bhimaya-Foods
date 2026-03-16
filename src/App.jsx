@@ -224,8 +224,6 @@ function App() {
     const encodedMessage = encodeURIComponent(messageText);
 
     setIsProcessingOrder(true);
-    // DEBUG ALERT
-    alert("🔍 Step 1: Attempting to save order to Firestore...");
     
     // Save customer and order to Firestore
     try {
@@ -270,8 +268,8 @@ function App() {
           name: item.name,
           price: item.price,
           quantity: item.quantity,
-          weight: item.weight || '',
-          image: item.image || ''
+          weight: item.weight || ''
+          // Removed image payload to stay within Firestore 1MB limit
         })),
         subtotal: total,
         deliveryCharge: delivery,
@@ -282,8 +280,6 @@ function App() {
       };
       
       const docRef = await addDoc(collection(db, "orders"), orderData);
-      // DEBUG ALERT
-      alert(`✅ Step 2: Firestore write successful!\nDocument ID: ${docRef.id}\n\nOpening WhatsApp...`);
 
       // ✅ SUCCESS: ONLY NOW open WhatsApp and clear UI
       window.open(
@@ -300,8 +296,7 @@ function App() {
       setCustomerState("");
       setCustomerPincode("");
       
-      alert(`🎉 Order #${orderID} placed successfully! We've opened WhatsApp for you to confirm the order.`);
-
+      // Removed alert as per user request to avoid intrusive popups
     } catch (error) {
       console.error("Error saving order:", error);
       alert(`❌ Ops! We couldn't save your order to the database.\n\nError: ${error.message || "Connection issue"}\n\nPlease try again or contact us directly.`);
