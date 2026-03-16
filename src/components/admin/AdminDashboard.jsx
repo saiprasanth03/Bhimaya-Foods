@@ -263,10 +263,25 @@ const AdminDashboard = () => {
 
         setIsSyncing(prev => ({ ...prev, [order.id]: true }));
 
+        // Pre-open a blank window to bypass popup blockers
+        const newWindow = window.open('about:blank', '_blank');
+
         try {
+            // Safely format date
+            let orderDateFormatted;
+            try {
+                const date = order.createdAt?.seconds 
+                    ? new Date(order.createdAt.seconds * 1000) 
+                    : new Date();
+                orderDateFormatted = date.toISOString().replace('T', ' ').split('.')[0];
+            } catch (e) {
+                console.warn("Date formatting failed, using current date", e);
+                orderDateFormatted = new Date().toISOString().replace('T', ' ').split('.')[0];
+            }
+
             const payload = {
                 order_id: order.orderID || order.id,
-                order_date: new Date(order.createdAt?.seconds * 1000).toISOString().replace('T', ' ').split('.')[0],
+                order_date: orderDateFormatted,
                 pickup_location: selectedPickup || "Primary",
                 billing_customer_name: order.customerName,
                 billing_last_name: "",
@@ -278,17 +293,24 @@ const AdminDashboard = () => {
                 billing_email: order.customerEmail || "customer@bhimayafoods.com",
                 billing_phone: order.customerPhone,
                 shipping_is_billing: true,
-                order_items: order.items.map(item => ({
-                    name: item.name,
-                    sku: item.id || item.name,
-                    units: parseInt(item.quantity) || 1,
-                    selling_price: parseFloat(item.price),
-                    discount: 0,
-                    tax: 0,
-                    hsn: ""
-                })),
+                order_items: order.items.map(item => {
+                    // Sanitize price (remove currency symbols, ensure it's a number)
+                    const cleanPrice = typeof item.price === 'string' 
+                        ? parseFloat(item.price.replace(/[^\d.]/g, '')) 
+                        : parseFloat(item.price);
+                    
+                    return {
+                        name: item.name,
+                        sku: item.id || item.name,
+                        units: parseInt(item.quantity) || 1,
+                        selling_price: isNaN(cleanPrice) ? 0 : cleanPrice,
+                        discount: 0,
+                        tax: 0,
+                        hsn: ""
+                    };
+                }),
                 payment_method: (order.paymentStatus === 'Successful' || order.paymentMethod === 'Online') ? 'Prepaid' : 'COD',
-                sub_total: parseFloat(order.totalAmount),
+                sub_total: parseFloat(String(order.totalAmount).replace(/[^\d.]/g, '')) || 0,
                 length: 10,
                 breadth: 10,
                 height: 10,
@@ -310,14 +332,24 @@ const AdminDashboard = () => {
                 const srOrderId = result.order_id || result.data?.order_id;
                 const srShipmentId = result.shipment_id || result.data?.shipment_id;
 
-                alert(`✅ Success! Order synced to Shiprocket.\n${srOrderId ? `Shiprocket Order ID: ${srOrderId}` : ''}`);
+                if (srOrderId && newWindow) {
+                    newWindow.location.href = `https://app.shiprocket.in/orders/details/${srOrderId}`;
+                } else {
+                    // If Shiprocket says OK but didn't give an ID, it's usually a validation error in their JSON
+                    console.error("Shiprocket Success but No ID:", result);
+                    const errorDetail = result.message || (result.errors ? JSON.stringify(result.errors) : "Unknown API response");
+                    alert(`⚠️ Shiprocket didn't return an Order ID.\n\nMessage: ${errorDetail}`);
+                    if (newWindow) newWindow.close();
+                }
                 
-                // Save Shiprocket IDs to the order document
-                await updateDoc(doc(db, "orders", order.id), { 
-                    status: 'Processing',
-                    shiprocketOrderId: srOrderId || null,
-                    shiprocketShipmentId: srShipmentId || null
-                });
+                // Save Shiprocket IDs to the order document (if we have them)
+                if (srOrderId) {
+                    await updateDoc(doc(db, "orders", order.id), { 
+                        status: 'Processing',
+                        shiprocketOrderId: srOrderId || null,
+                        shiprocketShipmentId: srShipmentId || null
+                    });
+                }
             } else {
                 console.error("Shiprocket API Error:", result);
                 let errorMsg = result.message || "Invalid Data";
@@ -328,10 +360,16 @@ const AdminDashboard = () => {
                     errorMsg += `\n\nDetails:\n${detailedErrors}`;
                 }
                 alert(`❌ Sync Failed: ${errorMsg}`);
+                if (newWindow) newWindow.close();
             }
         } catch (error) {
-            console.error("Sync Error:", error);
-            alert("❌ Sync Error: Unexpected connection issue. Please check your internet or try again later.");
+            if (newWindow) newWindow.close();
+            console.error("DEBUG - Sync Error Details:", {
+                message: error.message,
+                stack: error.stack,
+                orderId: order.id
+            });
+            alert(`❌ Sync Error: ${error.message || "Unexpected connection issue"}.\n\nCheck console for technical details.`);
         } finally {
             setIsSyncing(prev => ({ ...prev, [order.id]: false }));
         }
@@ -384,7 +422,10 @@ const AdminDashboard = () => {
             }
 
             const encodedMessage = encodeURIComponent(messageText);
-            window.open(`https://wa.me/91${order.customerPhone}?text=${encodedMessage}`, "_blank");
+            const waUrl = `https://wa.me/91${order.customerPhone}?text=${encodedMessage}`;
+            
+            // Pre-open strategy for WhatsApp as well to be safe
+            const waWindow = window.open(waUrl, "_blank");
 
             // Clear pending update (onSnapshot will auto-refresh orders)
             setPendingUpdates(prev => {

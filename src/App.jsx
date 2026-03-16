@@ -48,6 +48,7 @@ function App() {
   const [customerCity, setCustomerCity] = useState("");
   const [customerState, setCustomerState] = useState("");
   const [customerPincode, setCustomerPincode] = useState("");
+  const [validStateForPincode, setValidStateForPincode] = useState("");
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState("whatsapp"); // 'whatsapp' initialized
@@ -157,12 +158,18 @@ function App() {
             // Map API state names to our dropdown names if necessary
             const apiState = info.State;
             setCustomerState(apiState);
+            setValidStateForPincode(apiState);
+          } else {
+            setValidStateForPincode("");
           }
         } catch (error) {
           console.error("Pincode lookup failed:", error);
+          setValidStateForPincode("");
         } finally {
           setPincodeLoading(false);
         }
+      } else {
+        setValidStateForPincode("");
       }
     };
     lookupPincode();
@@ -177,6 +184,11 @@ function App() {
     e.preventDefault();
     if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim() || !customerCity.trim() || !customerState.trim() || !customerPincode.trim()) {
       return alert("Please fill in all details including City, State, and Pincode.");
+    }
+
+    // Pincode and State validation
+    if (customerPincode.length === 6 && validStateForPincode && customerState !== validStateForPincode) {
+      return alert(`The entered pincode (${customerPincode}) is for ${validStateForPincode}, but you have selected ${customerState}. Please correct it to proceed.`);
     }
 
     // Snapshot cart and form values before any async/state operations
