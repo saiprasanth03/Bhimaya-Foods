@@ -201,13 +201,14 @@ const AdminDashboard = () => {
         setLocationsLoading(true);
         setLocationsError('');
         try {
-            const response = await fetch('/api/shiprocket/settings/get/pickup', {
+            const response = await fetch(`/api/shiprocket/settings/get/pickup?t=${Date.now()}`, {
                 method: 'GET',
                 headers: { 
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log("DEBUG - Pickup Location Response Status:", response.status);
             const result = await response.json();
             if (response.ok && result.data?.shipping_address) {
                 const locations = result.data.shipping_address;
@@ -332,7 +333,7 @@ const AdminDashboard = () => {
                 weight: 0.5
             };
 
-            const response = await fetch('/api/shiprocket/orders/create/adhoc', {
+            const response = await fetch(`/api/shiprocket/orders/create/adhoc?t=${Date.now()}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 {
-  "rewrites": [
-    { "source": "/api/shiprocket/:path*", "destination": "https://apiv2.shiprocket.in/v1/external/:path*" },
-    { "source": "/:path((?!api/).*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "/api/shiprocket/(.*)", "dest": "https://apiv2.shiprocket.in/v1/external/$1" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
