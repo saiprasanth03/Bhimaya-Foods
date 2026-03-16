@@ -183,15 +183,17 @@ const AdminDashboard = () => {
                 });
                 setOrdersList(orders);
                 setOrdersLoading(false);
-                setLastOrderSync(new Date().toLocaleTimeString());
+                setLastOrderSync(`${new Date().toLocaleTimeString()} (${orders.length} orders)`);
             } catch (err) {
                 console.error("Critical error processing orders snapshot:", err);
                 setLastOrderSync("Process Error");
+                alert(`⚠️ Dashboard Error: ${err.message}`);
             }
         }, (error) => {
             console.error("Error fetching orders:", error);
             setOrdersLoading(false);
             setLastOrderSync("Error");
+            alert(`⚠️ Firestore Listener Error: ${error.message}`);
         });
         ordersUnsubRef.current = unsubscribe;
         return unsubscribe;

@@ -224,6 +224,8 @@ function App() {
     const encodedMessage = encodeURIComponent(messageText);
 
     setIsProcessingOrder(true);
+    // DEBUG ALERT
+    alert("🔍 Step 1: Attempting to save order to Firestore...");
     
     // Save customer and order to Firestore
     try {
@@ -279,7 +281,9 @@ function App() {
         createdAt: serverTimestamp()
       };
       
-      await addDoc(collection(db, "orders"), orderData);
+      const docRef = await addDoc(collection(db, "orders"), orderData);
+      // DEBUG ALERT
+      alert(`✅ Step 2: Firestore write successful!\nDocument ID: ${docRef.id}\n\nOpening WhatsApp...`);
 
       // ✅ SUCCESS: ONLY NOW open WhatsApp and clear UI
       window.open(
