@@ -192,7 +192,7 @@ function ProductCard({
           {product.name}
         </h3>
 
-        <div className="mt-1 mb-2 min-h-[1.25rem]">
+        <div className="mt-1 mb-2">
           {product.description && (
             <p className={`text-sm ${product.description.toLowerCase().includes('out of stock') ? 'text-red-500 font-bold' : 'text-gray-600'}`}>
               {product.description}
@@ -200,55 +200,58 @@ function ProductCard({
           )}
         </div>
 
-        {/* Weight Selection */}
-        <div className="flex gap-2 mb-6">
-          {weights.map((w) => (
-            <button
-              key={w.label}
-              onClick={() => setSelectedWeight(w.label)}
-              className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${selectedWeight === w.label
-                ? "bg-primary text-white border-primary shadow-sm"
-                : "bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary"
-                }`}
-            >
-              {w.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex justify-between items-center mt-auto">
-          <span className="text-2xl font-bold text-primary">
-            ₹{currentPrice}
-          </span>
-
-          {qty > 0 ? (
-            <div className="flex items-center space-x-3">
+        {/* Aligned Footer Section */}
+        <div className="mt-auto">
+          {/* Weight Selection */}
+          <div className="flex gap-2 mb-6">
+            {weights.map((w) => (
               <button
-                onClick={() => decreaseQuantity(cartItemId)}
-                className="w-8 h-8 flex items-center justify-center border border-primary rounded-full transition hover:bg-orange-50 text-primary font-bold"
+                key={w.label}
+                onClick={() => setSelectedWeight(w.label)}
+                className={`py-1.5 px-4 rounded-lg text-xs font-bold transition-all border ${selectedWeight === w.label
+                  ? "bg-primary text-white border-primary shadow-sm"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary"
+                  }`}
               >
-                -
+                {w.label}
               </button>
-              <span className="font-semibold w-4 text-center">{qty}</span>
+            ))}
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-2xl font-bold text-primary">
+              ₹{currentPrice}
+            </span>
+
+            {qty > 0 ? (
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => decreaseQuantity(cartItemId)}
+                  className="w-8 h-8 flex items-center justify-center border border-primary rounded-full transition hover:bg-orange-50 text-primary font-bold"
+                >
+                  -
+                </button>
+                <span className="font-semibold w-4 text-center">{qty}</span>
+                <button
+                  onClick={() => increaseQuantity(cartItemId)}
+                  className="w-8 h-8 flex items-center justify-center border border-primary rounded-full transition hover:bg-orange-50 text-primary font-bold"
+                >
+                  +
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={() => increaseQuantity(cartItemId)}
-                className="w-8 h-8 flex items-center justify-center border border-primary rounded-full transition hover:bg-orange-50 text-primary font-bold"
+                onClick={() => !isOutOfStock && addToCart(product, selectedWeight, currentPrice)}
+                disabled={isOutOfStock}
+                className={`px-6 py-2 rounded-full font-bold transition-all duration-300 ${isOutOfStock
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed border border-gray-400"
+                  : "bg-primary text-white hover:bg-orange-700 shadow-md hover:shadow-lg active:scale-95"
+                  }`}
               >
-                +
+                {isOutOfStock ? "Out of Stock" : "Add"}
               </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => !isOutOfStock && addToCart(product, selectedWeight, currentPrice)}
-              disabled={isOutOfStock}
-              className={`px-6 py-2 rounded-full font-bold transition-all duration-300 ${isOutOfStock
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed border border-gray-400"
-                : "bg-primary text-white hover:bg-orange-700 shadow-md hover:shadow-lg active:scale-95"
-                }`}
-            >
-              {isOutOfStock ? "Out of Stock" : "Add"}
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
