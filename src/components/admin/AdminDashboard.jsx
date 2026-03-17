@@ -1778,29 +1778,6 @@ const AdminDashboard = () => {
                                     <div className="flex flex-wrap gap-4">
                                         <button
                                             onClick={async () => {
-                                                if (window.confirm('CRITICAL WARNING: This will delete ALL products! Are you absolutely sure?')) {
-                                                    try {
-                                                        const confirmText = window.prompt('Type "DELETE" to confirm purge.');
-                                                        if (confirmText === 'DELETE') {
-                                                            let count = 0;
-                                                            for (const p of products) {
-                                                                await deleteDoc(doc(db, "products", p.id));
-                                                                count++;
-                                                            }
-                                                            alert(`Successfully purged ${count} products.`);
-                                                            fetchProducts();
-                                                        }
-                                                    } catch (err) {
-                                                        alert("Error purging products: " + err.message);
-                                                    }
-                                                }
-                                            }}
-                                            className="bg-red-600 text-white px-4 py-2 rounded font-bold hover:bg-red-700 transition"
-                                        >
-                                            Purge All Products
-                                        </button>
-                                        <button
-                                            onClick={async () => {
                                                 if (window.confirm('Delete all test orders?')) {
                                                     try {
                                                         let count = 0;
