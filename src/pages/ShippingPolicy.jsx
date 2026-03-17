@@ -39,12 +39,12 @@ const ShippingPolicy = () => {
               <div className="flex-1 border border-orange-200 p-4 rounded-lg bg-orange-50">
                 <p className="text-gray-800 font-bold">Standard Shipping</p>
                 <p className="text-2xl text-primary font-bold">₹49</p>
-                <p className="text-xs text-gray-500">For orders below ₹499</p>
+                <p className="text-xs text-gray-500">For orders below ₹999</p>
               </div>
               <div className="flex-1 border border-green-200 p-4 rounded-lg bg-green-50">
                 <p className="text-gray-800 font-bold">Free Shipping</p>
                 <p className="text-2xl text-secondary font-bold">FREE</p>
-                <p className="text-xs text-gray-500">On orders above ₹499</p>
+                <p className="text-xs text-gray-500">On orders above ₹999</p>
               </div>
             </div>
           </section>

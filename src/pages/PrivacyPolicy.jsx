@@ -72,7 +72,7 @@ const PrivacyPolicy = () => {
           <section className="bg-orange-50 p-6 rounded-xl border border-orange-100 text-center">
             <h2 className="text-xl font-bold text-primary mb-2">🏢 Contact Information</h2>
             <p className="font-bold text-gray-800">Bhimaya Foods</p>
-            <p className="text-gray-600">📍 Bhimavaram, Andhra Pradesh, India</p>
+            <p className="text-gray-600">📍 Tippanagunta  Krishna(dist)  Andhra Pradesh, India</p>
             <p className="text-gray-600">📧 Email: <a href="mailto:bhimayafoods@gmail.com" className="text-secondary font-bold">bhimayafoods@gmail.com</a></p>
           </section>
         </div>

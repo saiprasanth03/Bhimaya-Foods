@@ -40,7 +40,7 @@ const ContactUs = () => {
             <div>
               <h2 className="text-2xl font-bold text-primary mb-2">Address</h2>
               <p className="text-gray-700 text-lg">
-                Bhimaya Foods, Bhimavaram, Andhra Pradesh, India
+                Bhimaya Foods, Tippanagunta  Krishna(dist)  Andhra Pradesh, India
               </p>
             </div>
           </div>
