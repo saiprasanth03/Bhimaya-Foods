@@ -1,13 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const INDIAN_STATES = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
   "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
   "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
   "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Jammu and Kashmir", 
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Jammu and Kashmir",
 ];
+
+const ProgressBar = ({ step, steps }) => (
+  <div className="bg-white border-b sticky top-16 md:top-20 z-30 py-4 shadow-sm mb-6">
+    <div className="max-w-3xl mx-auto px-4">
+      <div className="flex items-center justify-between relative">
+        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
+        <div
+          className="absolute top-1/2 left-0 h-0.5 bg-blue-600 transition-all duration-300 -translate-y-1/2 z-0"
+          style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+        ></div>
+        {steps.map((s) => (
+          <div key={s.id} className="relative z-10 flex flex-col items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300 ${
+                step > s.id ? 'bg-blue-600 text-white' :
+                step === s.id ? 'bg-blue-600 text-white ring-4 ring-blue-100' : 'bg-gray-200 text-gray-500'
+              }`}
+            >
+              {step > s.id ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+              ) : s.id}
+            </div>
+            <span className={`mt-2 text-[10px] md:text-xs font-bold uppercase transition-colors duration-300 ${step >= s.id ? 'text-blue-600' : 'text-gray-400'}`}>
+              {s.name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const CheckoutPage = ({
   cart,
@@ -19,8 +50,11 @@ const CheckoutPage = ({
   isProcessingOrder,
   customerDetails,
   setCustomerDetails,
-  pincodeLoading,
-  pincodeStatus,
+  // eslint-disable-next-line no-unused-vars
+  pincodeLoading: _pincodeLoading,
+  // eslint-disable-next-line no-unused-vars
+  pincodeStatus: _pincodeStatus,
+
   validStateForPincode,
   codLimit,
   COD_FEE,
@@ -73,43 +107,9 @@ const CheckoutPage = ({
     setCustomerDetails(prev => ({ ...prev, [name]: value }));
   };
 
-  // Progress Bar Component
-  const ProgressBar = () => (
-    <div className="bg-white border-b sticky top-16 md:top-20 z-30 py-4 shadow-sm mb-6">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="flex items-center justify-between relative">
-          {/* Connector Lines */}
-          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
-          <div 
-            className="absolute top-1/2 left-0 h-0.5 bg-blue-600 transition-all duration-300 -translate-y-1/2 z-0"
-            style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
-          ></div>
-
-          {steps.map((s, idx) => (
-            <div key={s.id} className="relative z-10 flex flex-col items-center">
-              <div 
-                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300 ${
-                  step > s.id ? 'bg-blue-600 text-white' : 
-                  step === s.id ? 'bg-blue-600 text-white ring-4 ring-blue-100' : 'bg-gray-200 text-gray-500'
-                }`}
-              >
-                {step > s.id ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                ) : s.id}
-              </div>
-              <span className={`mt-2 text-[10px] md:text-xs font-bold uppercase transition-colors duration-300 ${step >= s.id ? 'text-blue-600' : 'text-gray-400'}`}>
-                {s.name}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gray-50 pb-20 mt-16 md:mt-20 flex flex-col">
-      <ProgressBar />
+      <ProgressBar step={step} steps={steps} />
       
       <div className="max-w-6xl mx-auto px-4 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
