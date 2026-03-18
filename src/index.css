@@ -4,7 +4,6 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-y: auto !important;
 }
 
 body {
@@ -13,7 +12,6 @@ body {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  overflow-y: auto !important;
 }
 
 /* Specific class to allow selection for devs/owners */
