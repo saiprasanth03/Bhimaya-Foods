@@ -4,7 +4,7 @@ function Hero() {
   return (
     <section
       id="home"
-      className="min-h-[70vh] md:h-screen flex items-center justify-center bg-cover bg-center text-white"
+      className="min-h-[70vh] md:h-screen flex items-center justify-center bg-cover bg-center text-white -mt-16 md:-mt-20"
       style={{
         backgroundImage:
           `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url(${heroImg})`,

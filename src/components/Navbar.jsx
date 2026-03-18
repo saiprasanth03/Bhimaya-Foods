@@ -1,25 +1,11 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 function Navbar({ cartCount, openCart, hideLinks }) {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <header
-      className={`sticky top-0 w-full z-[100] transition-all duration-300 ${scrolled
-          ? "bg-background shadow-md"
-          : "bg-background/90"
-        }`}
+      className="sticky top-0 w-full z-[100] bg-background shadow-md border-b border-gray-100 transition-all duration-300"
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-16 md:h-20">
 
@@ -36,7 +22,7 @@ function Navbar({ cartCount, openCart, hideLinks }) {
 
         {/* Navigation */}
         {!hideLinks && (
-          <nav className="hidden lg:flex space-x-8 font-medium">
+          <nav className="hidden lg:flex space-x-8 font-medium text-gray-800">
             <Link to="/" className="hover:text-secondary transition">
               Home
             </Link>
@@ -64,7 +50,7 @@ function Navbar({ cartCount, openCart, hideLinks }) {
         </button> */}
         <Link
           to="/cart"
-          className="relative cursor-pointer bg-primary text-white p-3 rounded-full hover:scale-105 transition mt-[5px] flex items-center justify-center"
+          className="relative cursor-pointer p-3 rounded-full hover:scale-105 transition mt-[5px] flex items-center justify-center bg-primary text-white"
         >
           <svg
             width="24"
