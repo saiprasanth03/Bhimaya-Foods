@@ -32,7 +32,12 @@ function App() {
       return !sessionStorage.getItem('bhimaya_products');
     } catch { return true; }
   });
-  const [storeSettings, setStoreSettings] = useState(null);
+  const [storeSettings, setStoreSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bhimaya_settings');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('bhimaya_cart');
@@ -403,7 +408,9 @@ function App() {
         const docRef = doc(db, "settings", "store");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setStoreSettings(docSnap.data());
+          const data = docSnap.data();
+          setStoreSettings(data);
+          try { localStorage.setItem('bhimaya_settings', JSON.stringify(data)); } catch { }
         } else {
           setStoreSettings({ isOpen: true, closedMessage: '' });
         }
@@ -473,7 +480,10 @@ function App() {
   if (!isOnline) {
     return <Offline />;
   }
-  if (loading || userLoading || settingsLoading) {
+  // Improved performance: Show app immediately if products are cached
+  const isEssentialDataLoading = (loading && products.length === 0);
+  
+  if (isEssentialDataLoading) {
     return <Loader />;
   }
   

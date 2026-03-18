@@ -183,6 +183,7 @@ function ProductCard({
         <img
           src={product.image}
           alt={product.name}
+          loading="lazy"
           className="w-full h-full object-cover hover:scale-110 transition duration-500"
         />
         <span className="absolute top-4 right-4 bg-secondary text-white px-3 py-1 rounded-full text-sm">
